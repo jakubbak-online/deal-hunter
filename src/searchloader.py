@@ -2,16 +2,14 @@
 
 import csv
 from linkcomposer import linkcomposer
-def searchloader():
+def searchloader(data):
     linklist = []
 
-    with open('data.csv') as f:
+    with open(data) as f:
         DictReaderObject = csv.DictReader(f)
-
 
         for row in DictReaderObject:
             search = dict(row)
-
 
             link = linkcomposer(primary_category=search['primary_category'],
                                 secondary_category=search['secondary_category'],

@@ -38,15 +38,12 @@ def linkcomposer(primary_category=None, secondary_category=None, subcategory=Non
         addand = True
 
     if min_price is not (None or 0 or ''):
-
         if addand is True:
             final_query += ("&search")
         addand = True
-
         final_query += ("%5Bfilter_float_price:from%5D="+min_price)
 
     if max_price is not (None or 0 or ''):
-
         if addand is True:
             final_query += ("&search")
         addand = True
