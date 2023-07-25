@@ -21,10 +21,10 @@ offers = []
 for count, link in enumerate(link_list):
     driver = webdriver.Chrome()
     driver.get(link)
-    #driver.implicitly_wait(5)
+    driver.implicitly_wait(5)
 
     try:
-        elements = WebDriverWait(driver, timeout=10, ignored_exceptions=ignored_exceptions).until(
+        elements = WebDriverWait(driver, timeout=15, ignored_exceptions=ignored_exceptions).until(
             expected_conditions.visibility_of_all_elements_located((By.XPATH, xpath))
         )
 
