@@ -12,4 +12,4 @@ link_list = search_loader('data.csv')
 search_offers(link_list)
 
 end_time = time.time()
-print(end_time-start_time)
+print(end_time - start_time)

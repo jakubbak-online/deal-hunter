@@ -3,7 +3,6 @@ import csv
 
 def link_composer(primary_category=None, secondary_category=None, subcategory=None,
                   localization=None, query=None, distance=None, min_price=None, max_price=None):
-
     final_query = "https://www.olx.pl/"
 
     empty = (None or 0 or '')
@@ -31,7 +30,7 @@ def link_composer(primary_category=None, secondary_category=None, subcategory=No
     addand = False
 
     if distance is not empty:
-        final_query += ("%5Bdist%5D="+distance)
+        final_query += ("%5Bdist%5D=" + distance)
 
         if addand is True:
             final_query += "&search"
@@ -41,13 +40,13 @@ def link_composer(primary_category=None, secondary_category=None, subcategory=No
         if addand is True:
             final_query += "&search"
         addand = True
-        final_query += ("%5Bfilter_float_price:from%5D="+min_price)
+        final_query += ("%5Bfilter_float_price:from%5D=" + min_price)
 
     if max_price is not empty:
         if addand is True:
             final_query += "&search"
 
-        final_query += ("%5Bfilter_float_price:to%5D="+max_price)
+        final_query += ("%5Bfilter_float_price:to%5D=" + max_price)
 
     return final_query
 
