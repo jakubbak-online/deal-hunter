@@ -1,14 +1,65 @@
 # loads csv file, and uses linkcomposer
-
 import csv
-from linkcomposer import linkcomposer
+# from linkcomposer import linkcomposer
+
+def linkcomposer(primary_category=None, secondary_category=None, subcategory=None,
+                 localization=None, query=None, distance=None, min_price=None, max_price=None):
+
+    final_query = "https://www.olx.pl/"
+
+    if primary_category and secondary_category and subcategory is (None or 0):
+        final_query += "oferty/"
+    else:
+        if primary_category is not (None or 0 or ''):
+            final_query += (primary_category + "/")
+
+        if secondary_category is not (None or 0 or ''):
+            final_query += (secondary_category + "/")
+
+        if subcategory is not (None or 0 or ''):
+            final_query += (subcategory + "/")
+
+
+    if localization is not (None or 0 or ''):
+        final_query += (localization + "/")
+
+    if query is not (None or 0 or ''):
+        final_query += ("q-" + query + "/")
+
+    final_query += "?search"
+
+    addand = False
+
+    if distance is not (None or 0 or ''):
+        final_query += ("%5Bdist%5D="+distance)
+
+        if addand is True:
+            final_query += ("&search")
+        addand = True
+
+    if min_price is not (None or 0 or ''):
+        if addand is True:
+            final_query += ("&search")
+        addand = True
+        final_query += ("%5Bfilter_float_price:from%5D="+min_price)
+
+    if max_price is not (None or 0 or ''):
+        if addand is True:
+            final_query += ("&search")
+        addand = True
+
+        final_query += ("%5Bfilter_float_price:to%5D="+max_price)
+
+    return final_query
+
+
 def searchloader(data):
     linklist = []
 
     with open(data) as f:
-        DictReaderObject = csv.DictReader(f)
+        dict_reader_object = csv.DictReader(f)
 
-        for row in DictReaderObject:
+        for row in dict_reader_object:
             search = dict(row)
 
             link = linkcomposer(primary_category=search['primary_category'],
