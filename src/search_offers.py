@@ -5,6 +5,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
+import prettytable
+
 ignored_exceptions = (NoSuchElementException, StaleElementReferenceException)
 xpath = "//div[@data-testid='listing-grid']/div[@id='div-gpt-ad-listing-sponsored-ad']/" \
         "following-sibling::div[@data-cy='l-card'][not(contains(descendant::div, 'Wyróżnione'))]"
@@ -15,6 +17,7 @@ def search_offers(link_list_inner):
 
     driver = webdriver.Chrome()
 
+    table = prettytable.PrettyTable(header=False)
     for count, link in enumerate(link_list_inner):
         driver.get(link)
 
@@ -22,38 +25,35 @@ def search_offers(link_list_inner):
             elements = WebDriverWait(driver, timeout=9, ignored_exceptions=ignored_exceptions).until(
                 expected_conditions.visibility_of_all_elements_located((By.XPATH, xpath))
             )
-
             offers.append(elements)
 
-            for count2, offer in enumerate(offers[count]):
-                chunks = offer.text.split("\n")
+            # table = prettytable.PrettyTable(header=False)
+            for offer in offers[count]:
+                split_offer = offer.text.split("\n")
 
-                if chunks[2] != "do negocjacji":
-                    chunks.insert(2, "")
+                if split_offer[2] != "do negocjacji":
+                    split_offer.insert(2, "nie do negocjacji")
 
+                split_offer.insert(0, offer.get_attribute("id"))
+
+                split_offer_buffer = split_offer[5].split(" - ")
+                split_offer.append(split_offer_buffer[1])
+                split_offer[5] = split_offer_buffer[0]
+
+                table.add_row(split_offer)
+
+                '''
                 for chunk in chunks:
-                    print(chunk)
-                '''
-                if chunks[3] != "do negocjacji":
-                    chunks.append(chunks[3])
-                    chunks[3] = None
-
-                print(f"{chunks[0]:30}", end=None)
-                print(f"{chunks[1]}", end=None)
-                print(f"{chunks[2]}", end=None)
-                print(f"{chunks[3]}", end=None)
-                print(f"{chunks[4]}", end=None)
+                    table.add_column(chunk)
+                    table.add_row()
+                    # print("{:20}".format(chunk), end=None)
                 '''
 
-                print("-------------------------------------------------------------------------------------")
-
-                '''
-                for count3, chunk in enumerate(chunks):
-                    print(str(count3) + " " + str(chunk))
-                '''
-                # print("Oferta nr " + str(count2))
+            # print(table.get_csv_string())
+            # print("Oferta nr " + str(count2))
 
         finally:
             pass
 
+    print(table)
     driver.quit()
