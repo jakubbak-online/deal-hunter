@@ -25,7 +25,7 @@ def link_composer(primary_category=None, secondary_category=None, subcategory=No
     if query is not empty:
         final_query += ("q-" + query + "/")
 
-    final_query += "?search"
+    final_query += "?search%5Border%5D=created_at:desc&"
 
     addand = False
 

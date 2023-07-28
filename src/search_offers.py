@@ -8,8 +8,9 @@ from selenium.webdriver.support.wait import WebDriverWait
 import prettytable
 
 ignored_exceptions = (NoSuchElementException, StaleElementReferenceException)
-xpath = "//div[@data-testid='listing-grid']/div[@id='div-gpt-ad-listing-sponsored-ad']/" \
-        "following-sibling::div[@data-cy='l-card'][not(contains(descendant::div, 'Wyróżnione'))]"
+xpath = '//div[@data-testid="listing-grid"]/child::div[@data-cy="l-card" and ' \
+        'not(contains(descendant::div, "Wyróżnione")) and not(preceding::*' \
+        '[contains(descendant::text(), "Sprawdź ogłoszenia w większej odległości:")])]'
 
 
 def search_offers(link_list_inner):
@@ -21,6 +22,7 @@ def search_offers(link_list_inner):
     for count, link in enumerate(link_list_inner):
         driver.get(link)
 
+        print(link)
         try:
             elements = WebDriverWait(driver, timeout=9, ignored_exceptions=ignored_exceptions).until(
                 expected_conditions.visibility_of_all_elements_located((By.XPATH, xpath))
