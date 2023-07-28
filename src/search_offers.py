@@ -1,20 +1,22 @@
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
 import prettytable
-import csv
+# import csv
 
-ignored_exceptions = (NoSuchElementException, StaleElementReferenceException)
-xpath = '//div[@data-testid="listing-grid"]/child::div[@data-cy="l-card" and ' \
-        'not(contains(descendant::div, "Wyróżnione")) and not(preceding::*' \
-        '[contains(descendant::text(), "Sprawdź ogłoszenia w większej odległości:")])]'
+ignored_exceptions = (NoSuchElementException, StaleElementReferenceException, TimeoutException)
+xpath = '//div[not(preceding::div[contains(descendant::text(), "Znaleźliśmy  0 ogłoszeń")])]' \
+        '/div[@data-testid="listing-grid"]/child::div[@data-cy="l-card"' \
+        'and not(contains(descendant::div, "Wyróżnione"))' \
+        'and not(preceding::*[contains(descendant::text(), "Sprawdź ogłoszenia w większej odległości:")])]'
 
 
-def search_offers(link_list_inner):
+def search_offers(link_list_inner, search_offers_save_location='./data/search_offers_data.csv'):
 
     # creates driver instance
     driver = webdriver.Chrome()
@@ -35,9 +37,15 @@ def search_offers(link_list_inner):
 
         try:
             # gets the elements of a page by xpath specified earlier
+            '''
             elements = WebDriverWait(driver, timeout=9, ignored_exceptions=ignored_exceptions).until(
                 expected_conditions.visibility_of_all_elements_located((By.XPATH, xpath))
             )
+            '''
+            elements = WebDriverWait(driver, timeout=2, ignored_exceptions=ignored_exceptions).until(
+                expected_conditions.visibility_of_all_elements_located((By.XPATH, xpath))
+            )
+
             offers.append(elements)
 
             # iterates through offers, preparing them for further actions
@@ -59,14 +67,14 @@ def search_offers(link_list_inner):
                 # adds split offer to table
                 table.add_row(split_offer)
 
-        finally:
-            pass
+        except TimeoutException:
+            print("("+str(count+1)+"/"+str(len(link_list_inner))+") "+"BRAK ELEMENTÓW W WYSZUKIWANIU")
 
     # print(table)
     print(table.get_csv_string())
     driver.quit()
 
-    with open('./data/search_offers_data.csv', 'wt', encoding="utf-8", newline='') as f:
+    with open(search_offers_save_location, 'wt', encoding="utf-8", newline='') as f:
         f.write(table.get_csv_string())
 
     return table.get_csv_string()
