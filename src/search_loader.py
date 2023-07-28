@@ -5,6 +5,8 @@ def link_composer(primary_category=None, secondary_category=None, subcategory=No
                   localization=None, query=None, distance=None, min_price=None, max_price=None):
     final_query = "https://www.olx.pl/"
 
+    # https://www.olx.pl/elektronika/fotografia/obiektywy/q-canon/?search%5Border%5D=created_at:desc&search%5Bfilter_float_price:to%5D=450
+    # https://www.olx.pl/elektronika/fotografia/obiektywy/q-canon/&search%5Border%5D=created_at:desc&search%5Bfilter_float_price:to%5D=500
     empty = (None or 0 or '')
 
     if primary_category and secondary_category and subcategory is (None or 0):
@@ -25,16 +27,12 @@ def link_composer(primary_category=None, secondary_category=None, subcategory=No
     if query is not empty:
         final_query += ("q-" + query + "/")
 
-    final_query += "?search%5Border%5D=created_at:desc&"
-
-    addand = False
+    final_query += "?search%5Border%5D=created_at:desc"
 
     if distance is not empty:
-        final_query += ("%5Bdist%5D=" + distance)
+        final_query += ("&search%5Bdist%5D=" + distance)
 
-        if addand is True:
-            final_query += "&search"
-        addand = True
+    addand = True
 
     if min_price is not empty:
         if addand is True:
