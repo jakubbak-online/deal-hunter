@@ -3,6 +3,7 @@ import time
 # my imports
 from search_loader import search_loader
 from search_offers import search_offers
+from process_search_results import remove_duplicates
 
 # time measurement
 start_time = time.time()
@@ -11,7 +12,9 @@ start_time = time.time()
 link_list = search_loader(".\data\data_long.csv")
 
 # searches offers using link list generated before, and saves it to specified location
-search_offers(link_list, search_offers_save_location="./data/search_offers_data.csv")
+search_offers(link_list, file_name="./data/search_offers_data.csv")
+
+remove_duplicates(file_name="./data/search_offers_data.csv")
 
 # time measurement
 end_time = time.time()

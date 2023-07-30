@@ -29,7 +29,6 @@ def link_composer(primary_category=None, secondary_category=None, subcategory=No
 
     final_query += "?"
 
-
     if distance is not empty:
         final_query += ("&search[dist]=" + distance)
     addand = True
@@ -59,7 +58,6 @@ def search_loader(data):
         dict_reader_object.pop(0)
 
         for row in dict_reader_object:
-
             link = link_composer(primary_category=row[0],
                                  secondary_category=row[1],
                                  subcategory=row[2],
