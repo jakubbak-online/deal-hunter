@@ -15,6 +15,7 @@ def remove_duplicates(file_name="./data/search_offers_data.csv"):
 
         csv_write = csv.writer(f, delimiter=',')
         f.truncate(0)
+        f.seek(0)
 
         for line in csv_set:
             csv_write.writerow(line)
@@ -23,4 +24,4 @@ def remove_duplicates(file_name="./data/search_offers_data.csv"):
         # print(csv_list)
 
 
-remove_duplicates()
+# remove_duplicates()
