@@ -3,11 +3,10 @@ import time
 # my imports
 from search_loader import search_loader
 from search_offers import search_offers
-# from process_search_results import remove_duplicates
 
 
 # generates link list using search_loader.py from a csv file
-link_list = search_loader(".\data\data_short.csv")
+link_list = search_loader(".\data\data_long.csv")
 
 # searches offers using link list generated before, and saves it to specified location
 while True:
@@ -18,6 +17,11 @@ while True:
 
     # time measurement
     end_time = time.time()
-    print(str(round(end_time - start_time, 2)) + " seconds")
-    print(str(len(link_list)) + " offers")
-    print(str(round((end_time - start_time) / len(link_list), 2)) + " seconds/offer")
+    print(f"\nSearch took {round(end_time - start_time, 2)} seconds \n"
+          f"Iterated through {len(link_list)} offers \n"
+          f"Average time per offer is {round((end_time - start_time) / len(link_list), 2)} \n")
+
+
+    print(f"Started sleeping")
+    time.sleep(150)
+    print(f"Finished sleeping")

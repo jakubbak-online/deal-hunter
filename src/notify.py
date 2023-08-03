@@ -24,28 +24,43 @@ def notify(offer_id=None,
     bot.send_message(
         chat_id=USER_ID,
         protect_content=True,
-        text=f"Nowa oferta! &#10"
+        text=f"<b>Nowa oferta!</b>"
              
-             f"ID oferty: "
-             f"{offer_id} &#10"
+             f"\n\n"
+             f"<u>ID</u>\n"
+             f"     {offer_id:15}"
              
-             f"Nazwa oferty: "
-             f"{offer_name} &#10"
+             f"\n"
+             f"\n"
+             f"<u>Oferty</u>\n"
+             f"     {offer_name:15}"
              
-             f"Cena oferty: "
-             f"{offer_price} &#10"
+             f"\n"
+             f"\n"
+             f"<u>Cena</u>\n"
+             f"     {offer_price:15}"
              
-             f"Czy do negocjacji: "
-             f"{offer_negotiation} &#10"
+             f"\n"
+             f"\n"
+             f"<u>Neg?</u>\n"
+             f"     {offer_negotiation:15}"
              
-             f"Stan oferty: "
-             f"{offer_condition} &#10"
+             f"\n"
+             f"\n"
+             f"<u>Stan</u>\n"
+             f"     {offer_condition:15}"
              
-             f"Lokalizacja oferty: "
-             f"{offer_location} &#10"
+             f"\n"
+             f"\n"
+             f"<u>Lokalizacja</u>\n"
+             f"     {offer_location:15}"
              
-             f"Data wystawienia oferty: "
-             f"{offer_date} &#10"
+             f"\n"
+             f"\n"
+             f"<u>Data</u>\n"
+             f"     {offer_date:15}"
              
+             f"\n"
+             f"\n"
              f"<a href='{offer_link}'>Link do oferty</a>",
         parse_mode="HTML")

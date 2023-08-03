@@ -10,6 +10,7 @@ from selenium.webdriver.chrome.options import Options
 
 # OTHER IMPORTS
 import pickle
+import time
 
 # MY IMPORTS
 import notify
@@ -32,17 +33,17 @@ with open(already_notified_path, "wb") as f:
 
 def search_offers(link_list_inner):
 
-    # CREATES WEBDRIVER INSTANCE, AND MINIMIZES IT
+    # CREATES WEBDRIVER INSTANCE, WITH OPTIONS ADDED
     chrome_options = Options()
     chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--incognito")
 
     driver = webdriver.Chrome(options=chrome_options)
-    driver.minimize_window()
-
 
     # EMPTY LIST OF OFFERS (offers is later used as a list of lists)
     # DON'T MOVE PLS
-    offers = []
+    offers = list()
 
     # GOES FOR EVERY LINK IN LIST OF LINKS
     for count, link in enumerate(link_list_inner):
@@ -50,7 +51,7 @@ def search_offers(link_list_inner):
         driver.get(link)
 
         # PROGRESS COUNT PRINT
-        print("("+str(count+1)+"/"+str(len(link_list_inner))+") "+link)
+        print(f"({count+1}/{len(link_list_inner)}) {time.ctime()[11:19]} || {link}")
 
         try:
             # SEARCH ELEMENTS IN DOM WITH XPATH SPECIFIED EARLIER
@@ -88,8 +89,14 @@ def search_offers(link_list_inner):
                 # APPENDS LINK TO SPLIT_OFFER
                 split_offer.append(offer.find_element(By.TAG_NAME, "a").get_attribute("href"))
 
-                notify.notify(split_offer[0], split_offer[1], split_offer[2], split_offer[3], split_offer[4],
-                              split_offer[5], split_offer[6], split_offer[7])
+                notify.notify(offer_id=split_offer[0],
+                              offer_name=split_offer[1],
+                              offer_price=split_offer[2],
+                              offer_negotiation=split_offer[3],
+                              offer_condition=split_offer[4],
+                              offer_location=split_offer[5],
+                              offer_date=split_offer[6],
+                              offer_link=split_offer[7])
 
                 print(f"Notified user about offer number {offer.get_attribute('id')}")
 
@@ -98,12 +105,10 @@ def search_offers(link_list_inner):
                     already_notified.add(offer.get_attribute("id"))
                     pickle.dump(already_notified, f, protocol=pickle.HIGHEST_PROTOCOL)
 
-
         except TimeoutException:
-            print("("+str(count+1)+"/"+str(len(link_list_inner))+") "+"BRAK ELEMENTÓW W WYSZUKIWANIU")
+            print(f"({count+1}/{len(link_list_inner)}) BRAK ELEMENTÓW W WYSZUKIWANIU")
 
             # APPENDS EMPTY LIST TO OFFERS, SO LOOP CAN PROCEED NORMALLY
             offers.append([])
 
     driver.quit()
-
