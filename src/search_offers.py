@@ -15,20 +15,18 @@ import time
 # MY IMPORTS
 import notify
 
-# VARIABLES TO BE USED LATER
+# CONSTANTS TO BE USED LATER
 ignored_exceptions = (NoSuchElementException, StaleElementReferenceException, TimeoutException)
-xpath = '//div[not(preceding::div[contains(descendant::text(), "Znaleźliśmy  0 ogłoszeń")])]' \
-        '/div[@data-testid="listing-grid"]/child::div[@data-cy="l-card"' \
-        'and not(contains(descendant::div, "Wyróżnione"))' \
-        'and not(preceding::*[contains(descendant::text(), "Sprawdź ogłoszenia w większej odległości:")])]'
-already_notified_path = "./data/already_notified.pickle"
 
-# ATOMIC OPEN, use in case pickle file is missing or sth
-'''
-with open(already_notified_path, "wb") as f:
-    already_notified = {"851840892"}
-    pickle.dump(already_notified, f, protocol=pickle.HIGHEST_PROTOCOL)
-'''
+# FULL XPATH
+'''//div[not(preceding::div[contains(descendant::text(), "Znaleźliśmy  0 ogłoszeń")])]/div[
+@data-testid="listing-grid"][1]/child::div[@data-cy="l-card"and not(contains(descendant::div, "Wyróżnione"))]'''
+
+xpath = ('//div[not(preceding::div[contains(descendant::text(), "Znaleźliśmy  0 ogłoszeń")])]'
+         '/div[@data-testid="listing-grid"][1]'
+         '/child::div[@data-cy="l-card"and not(contains(descendant::div, "Wyróżnione"))]')
+
+already_notified_path = "./data/already_notified.pickle"
 
 
 def search_offers(link_list_inner):
@@ -38,6 +36,7 @@ def search_offers(link_list_inner):
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--incognito")
+    chrome_options.page_load_strategy = "eager"
 
     driver = webdriver.Chrome(options=chrome_options)
 
@@ -51,7 +50,9 @@ def search_offers(link_list_inner):
         driver.get(link)
 
         # PROGRESS COUNT PRINT
-        print(f"({count+1}/{len(link_list_inner)}) {time.ctime()[11:19]} || {link}")
+        offer_progress = f"({count+1}/{len(link_list_inner)})"
+        offer_notify_count = 1
+        print(f"\n{offer_progress} {time.ctime()[11:19]} || {link}")
 
         try:
             # SEARCH ELEMENTS IN DOM WITH XPATH SPECIFIED EARLIER
@@ -98,7 +99,9 @@ def search_offers(link_list_inner):
                               offer_date=split_offer[6],
                               offer_link=split_offer[7])
 
-                print(f"Notified user about offer number {offer.get_attribute('id')}")
+                print(f"{offer_progress} Notified user about offer number {offer.get_attribute('id'):9}. "
+                      f"It was {offer_notify_count}'th offer")
+                offer_notify_count += 1
 
                 # AFTER NOTIFYING ADDS ID TO ALREADY_NOTIFIED
                 with open(already_notified_path, "wb") as f:
@@ -106,9 +109,12 @@ def search_offers(link_list_inner):
                     pickle.dump(already_notified, f, protocol=pickle.HIGHEST_PROTOCOL)
 
         except TimeoutException:
-            print(f"({count+1}/{len(link_list_inner)}) BRAK ELEMENTÓW W WYSZUKIWANIU")
-
+            offer_notify_count = 0
+            print(f"{offer_progress} No offers in search")
             # APPENDS EMPTY LIST TO OFFERS, SO LOOP CAN PROCEED NORMALLY
             offers.append([])
+
+        if offer_notify_count == 1:
+            print(f"{offer_progress} No new offers were seen")
 
     driver.quit()

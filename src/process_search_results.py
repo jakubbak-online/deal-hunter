@@ -1,7 +1,9 @@
+# THIS IS UNUSED SO FAR, THOUGH I MAY NEED IT LATER
+
 import csv
 
 
-def remove_duplicates(file_name="./data/search_offers_data.csv"):
+def remove_duplicates(file_name):
 
     with open(file_name, 'r+', newline="", encoding="utf-8") as f:
         csv_read = list(csv.reader(f, delimiter=","))

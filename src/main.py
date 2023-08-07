@@ -6,9 +6,9 @@ from search_offers import search_offers
 
 
 # generates link list using search_loader.py from a csv file
-link_list = search_loader(".\data\data_long.csv")
+link_list = search_loader(".\data\data_very_long.csv")
 
-# searches offers using link list generated before, and saves it to specified location
+
 while True:
     # time measurement
     start_time = time.time()
@@ -18,7 +18,7 @@ while True:
     # time measurement
     end_time = time.time()
     print(f"\nSearch took {round(end_time - start_time, 2)} seconds \n"
-          f"Iterated through {len(link_list)} offers \n"
+          f"Iterated through {len(link_list)} links \n"
           f"Average time per offer is {round((end_time - start_time) / len(link_list), 2)} \n")
 
 
