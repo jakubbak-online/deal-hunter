@@ -27,4 +27,16 @@ def clear_file(pickle_file="already_notified.pickle"):
         pickle.dump(set(), f)
 
 
+def populate_file(pickle_file="already_notified.pickle"):
+    how_many_elements = 1_000_000
+    populate_set = set()
+    for _ in range(0, how_many_elements):
+        populate_set.add(_)
+        if _ % 1_000_000 == 0:
+            print(_)
+
+    with open(pickle_file, "wb") as f:
+        pickle.dump(populate_set, f)
+
+
 clear_file()

@@ -1,17 +1,10 @@
-import os
-
 import telebot
 from telebot.apihelper import ApiTelegramException
 
-from dotenv import find_dotenv, load_dotenv
-
-# IMPORT ENV VARIABLES
-load_dotenv(find_dotenv())
-API_KEY = os.getenv("API_KEY")
-USER_ID = os.getenv("USER_ID")
+from handle_config import config
 
 # CREATE BOT INSTANCE
-bot = telebot.TeleBot(API_KEY)
+bot = telebot.TeleBot(config["API_KEY"])
 
 
 def notify(offer_id=None,
@@ -24,7 +17,7 @@ def notify(offer_id=None,
            offer_link=None):
     try:
         bot.send_message(
-            chat_id=USER_ID,
+            chat_id=config["USER_ID"],
             protect_content=True,
             text=f"<b>Nowa oferta!</b>"
 

@@ -14,13 +14,13 @@ import time
 
 # MY IMPORTS
 import notify
+import search_loader
+
+# VARIABLES FROM CONFIG
+from config import search_info_location
 
 # CONSTANTS TO BE USED LATER
 ignored_exceptions = (NoSuchElementException, StaleElementReferenceException, TimeoutException)
-
-# FULL XPATH
-'''//div[not(preceding::div[contains(descendant::text(), "Znaleźliśmy  0 ogłoszeń")])]/div[
-@data-testid="listing-grid"][1]/child::div[@data-cy="l-card"and not(contains(descendant::div, "Wyróżnione"))]'''
 
 xpath = ('//div[not(preceding::div[contains(descendant::text(), "Znaleźliśmy  0 ogłoszeń")])]'
          '/div[@data-testid="listing-grid"][1]'
@@ -28,8 +28,10 @@ xpath = ('//div[not(preceding::div[contains(descendant::text(), "Znaleźliśmy  
 
 already_notified_path = "./data/already_notified.pickle"
 
+link_list = search_loader.search_loader(search_info_location)
 
-def search_offers(link_list_inner):
+
+def search_offers(link_list_inner=link_list):
 
     # CREATES WEBDRIVER INSTANCE, WITH OPTIONS ADDED
     chrome_options = Options()
@@ -39,7 +41,6 @@ def search_offers(link_list_inner):
     chrome_options.page_load_strategy = "eager"
 
     driver = webdriver.Chrome(options=chrome_options)
-
     # EMPTY LIST OF OFFERS (offers is later used as a list of lists)
     # DON'T MOVE PLS
     offers = list()
