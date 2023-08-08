@@ -2,9 +2,9 @@
 
 ---
 
-## What is OLXBot?
+## What is DealHunter?
 
-OLXBot is a sniping tool for OLX.pl (polish craigslist-like site). \
+DealHunter is a sniping tool for OLX.pl (polish craigslist-like site). \
 (at least for now) It takes .csv file as an input, and telegram bot API to send notifications.
 
 
