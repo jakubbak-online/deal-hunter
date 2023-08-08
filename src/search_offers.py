@@ -17,7 +17,7 @@ import notify
 import search_loader
 
 # VARIABLES FROM CONFIG
-from config import search_info_location
+from handle_config import config
 
 # CONSTANTS TO BE USED LATER
 ignored_exceptions = (NoSuchElementException, StaleElementReferenceException, TimeoutException)
@@ -28,7 +28,7 @@ xpath = ('//div[not(preceding::div[contains(descendant::text(), "Znaleźliśmy  
 
 already_notified_path = "./data/already_notified.pickle"
 
-link_list = search_loader.search_loader(search_info_location)
+link_list = search_loader.search_loader(config["SEARCH_INFO_LOCATION"])
 
 
 def search_offers(link_list_inner=link_list):
