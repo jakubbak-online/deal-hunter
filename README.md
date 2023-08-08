@@ -1,4 +1,4 @@
-# OLXBot - bot for sniping on OLX
+# DealHunter - bot for sniping on OLX.pl!
 
 ---
 
