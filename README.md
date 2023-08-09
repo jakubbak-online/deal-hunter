@@ -11,7 +11,7 @@ DealHunter is a sniping tool for OLX.pl (polish craigslist-like site). \
 #### Requirements
 
 - Python
-- Chrome version 115 or newer
+- Chrome ver 115 or newer (alternatively ChromeDriver ver. 114)
 - Telegram
 - Git (for installation)
 
@@ -23,7 +23,10 @@ git clone https://github.com/jakubbak-online/DealHunter
 pip install -r requirements.txt
 cd src
 ```
-Now, update config.py with your Telegram Bot API key, and Telegram user id; then, fill in example_data.csv, or specify other location of csv file.
+Now, update config.py with your Telegram Bot API key, and Telegram user id. \
+You can use this guide to go through generating Bot API key: ```https://www.siteguarding.com/en/how-to-get-telegram-bot-api-token```\
+
+Then, fill in example_data.csv, or specify other location of csv file with info about search specifications.
 
 You can now, in /src/ use ```python3 main.py```, and it continuously will go through list of your offers, sending message to user specified in config.
 
