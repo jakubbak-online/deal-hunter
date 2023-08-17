@@ -4,8 +4,7 @@ import csv
 
 
 def remove_duplicates(file_name):
-
-    with open(file_name, 'r+', newline="", encoding="utf-8") as f:
+    with open(file_name, "r+", newline="", encoding="utf-8") as f:
         csv_read = list(csv.reader(f, delimiter=","))
         # print(csv_read)
 
@@ -15,7 +14,7 @@ def remove_duplicates(file_name):
             # print(line)
             csv_set.add(tuple(line))
 
-        csv_write = csv.writer(f, delimiter=',')
+        csv_write = csv.writer(f, delimiter=",")
         f.truncate(0)
         f.seek(0)
 

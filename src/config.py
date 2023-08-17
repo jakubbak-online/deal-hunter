@@ -1,6 +1,6 @@
 # FILL IN WITH YOUR INFO
 params = {
-    "API_KEY": None,
-    "USER_ID": None,
-    "SEARCH_INFO_LOCATION": ".\data\example_data.csv"
+    "API_KEY": "Replace this (keep quotation)",
+    "USER_ID": "Replace this (keep quotation)",
+    "SEARCH_INFO_LOCATION": ".\data\data_long.csv",
 }

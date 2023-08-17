@@ -5,11 +5,7 @@ from config import params
 
 load_dotenv(find_dotenv())
 
-config = {
-    "API_KEY": None,
-    "USER_ID": None,
-    "SEARCH_INFO_LOCATION": None
-}
+config = {"API_KEY": None, "USER_ID": None, "SEARCH_INFO_LOCATION": None}
 
 for element in config:
     try:
@@ -26,10 +22,10 @@ for element in config:
 
 print(config)
 
-'''
+"""
 load_dotenv(find_dotenv())
 
 if dotenv_exists is True:
     API_KEY = os.getenv("API_KEY")
     USER_ID = os.getenv("USER_ID")
-'''
+"""

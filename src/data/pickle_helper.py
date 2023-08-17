@@ -10,7 +10,6 @@ def print_all():
 
 
 def check_if_exists(id_to_check=""):
-
     with open("already_notified.pickle", "rb") as f:
         f = pickle.load(f)
 

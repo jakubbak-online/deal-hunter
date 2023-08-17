@@ -20,11 +20,17 @@ import search_loader
 from handle_config import config
 
 # CONSTANTS TO BE USED LATER
-ignored_exceptions = (NoSuchElementException, StaleElementReferenceException, TimeoutException)
+ignored_exceptions = (
+    NoSuchElementException,
+    StaleElementReferenceException,
+    TimeoutException,
+)
 
-xpath = ('//div[not(preceding::div[contains(descendant::text(), "Znaleźliśmy  0 ogłoszeń")])]'
-         '/div[@data-testid="listing-grid"][1]'
-         '/child::div[@data-cy="l-card"and not(contains(descendant::div, "Wyróżnione"))]')
+xpath = (
+    '//div[not(preceding::div[contains(descendant::text(), "Znaleźliśmy  0 ogłoszeń")])]'
+    '/div[@data-testid="listing-grid"][1]'
+    '/child::div[@data-cy="l-card"and not(contains(descendant::div, "Wyróżnione"))]'
+)
 
 already_notified_path = "./data/already_notified.pickle"
 
@@ -32,7 +38,6 @@ link_list = search_loader.search_loader(config["SEARCH_INFO_LOCATION"])
 
 
 def search_offers(link_list_inner=link_list):
-
     # CREATES WEBDRIVER INSTANCE, WITH OPTIONS ADDED
     chrome_options = Options()
     chrome_options.add_argument("--headless")
@@ -57,8 +62,12 @@ def search_offers(link_list_inner=link_list):
 
         try:
             # SEARCH ELEMENTS IN DOM WITH XPATH SPECIFIED EARLIER
-            elements = WebDriverWait(driver, timeout=2, ignored_exceptions=ignored_exceptions).until(
-                expected_conditions.visibility_of_all_elements_located((By.XPATH, xpath))
+            elements = WebDriverWait(
+                driver, timeout=2, ignored_exceptions=ignored_exceptions
+            ).until(
+                expected_conditions.visibility_of_all_elements_located(
+                    (By.XPATH, xpath)
+                )
             )
 
             # ADDS LIST OF ELEMENTS TO OFFERS LIST
@@ -89,19 +98,25 @@ def search_offers(link_list_inner=link_list):
                 split_offer[5] = split_offer_buffer[0]
 
                 # APPENDS LINK TO SPLIT_OFFER
-                split_offer.append(offer.find_element(By.TAG_NAME, "a").get_attribute("href"))
+                split_offer.append(
+                    offer.find_element(By.TAG_NAME, "a").get_attribute("href")
+                )
 
-                notify.notify(offer_id=split_offer[0],
-                              offer_name=split_offer[1],
-                              offer_price=split_offer[2],
-                              offer_negotiation=split_offer[3],
-                              offer_condition=split_offer[4],
-                              offer_location=split_offer[5],
-                              offer_date=split_offer[6],
-                              offer_link=split_offer[7])
+                notify.notify(
+                    offer_id=split_offer[0],
+                    offer_name=split_offer[1],
+                    offer_price=split_offer[2],
+                    offer_negotiation=split_offer[3],
+                    offer_condition=split_offer[4],
+                    offer_location=split_offer[5],
+                    offer_date=split_offer[6],
+                    offer_link=split_offer[7],
+                )
 
-                print(f"{offer_progress} Notified user about offer number {offer.get_attribute('id'):9}. "
-                      f"It was {offer_notify_count}'th offer")
+                print(
+                    f"{offer_progress} Notified user about offer number {offer.get_attribute('id'):9}. "
+                    f"It was {offer_notify_count}'th offer"
+                )
                 offer_notify_count += 1
 
                 # AFTER NOTIFYING ADDS ID TO ALREADY_NOTIFIED
