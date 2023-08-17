@@ -1,8 +1,8 @@
-# DealHunter - bot for sniping on OLX.pl!
+# deal-hunter - bot for sniping on OLX.pl!
 
 ---
 
-## What is DealHunter?
+## What is deal-hunter?
 
 DealHunter is a sniping tool for OLX.pl (polish craigslist-like site). \
 (at least for now) It takes .csv file as an input about searches information, and telegram bot API to send notifications.
@@ -19,7 +19,7 @@ DealHunter is a sniping tool for OLX.pl (polish craigslist-like site). \
 
 ## Installation and use
 ```commandline
-git clone https://github.com/jakubbak-online/DealHunter
+git clone https://github.com/jakubbak-online/deal-hunter
 pip install -r requirements.txt
 cd src
 ```
