@@ -5,7 +5,7 @@ from config import params
 
 load_dotenv(find_dotenv())
 
-config = {"API_KEY": None, "USER_ID": None, "SEARCH_INFO_LOCATION": None}
+config = {"API_KEY": None, "USER_ID": None}
 
 for element in config:
     try:
@@ -13,12 +13,10 @@ for element in config:
     except TypeError:
         config[f"{element}"] = params[f"{element}"]
     finally:
-        if config[f"{element}"] is None and params[f"{element}"] is not None:
-            config[f"{element}"] = params[f"{element}"]
-
         if config[f"{element}"] is None:
-            print("Something went wrong when importing config")
-
+            print(
+                "ERROR: Lack of correct variable in environment variables, or config.py"
+            )
 
 print(config)
 

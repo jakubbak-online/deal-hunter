@@ -11,39 +11,42 @@ from selenium.webdriver.chrome.options import Options
 # OTHER IMPORTS
 import pickle
 import time
+import chromedriver_autoinstaller
 
 # MY IMPORTS
 import notify
 import search_loader
 
 # VARIABLES FROM CONFIG
-from handle_config import config
+from config import search_info_location
 
 # CONSTANTS TO BE USED LATER
-ignored_exceptions = (
+IGNORED_EXCEPTIONS = (
     NoSuchElementException,
     StaleElementReferenceException,
     TimeoutException,
 )
 
-xpath = (
+XPATH = (
     '//div[not(preceding::div[contains(descendant::text(), "Znaleźliśmy  0 ogłoszeń")])]'
     '/div[@data-testid="listing-grid"][1]'
     '/child::div[@data-cy="l-card"and not(contains(descendant::div, "Wyróżnione"))]'
 )
 
-already_notified_path = "./data/already_notified.pickle"
+ALREADY_NOTIFIED_PATH = "./data/already_notified.pickle"
 
-link_list = search_loader.search_loader(config["SEARCH_INFO_LOCATION"])
+LINK_LIST = search_loader.search_loader(search_info_location)
+
+chromedriver_autoinstaller.install()
 
 
-def search_offers(link_list_inner=link_list):
+def search_offers(link_list_inner=LINK_LIST):
     # CREATES WEBDRIVER INSTANCE, WITH OPTIONS ADDED
     chrome_options = Options()
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--incognito")
-    chrome_options.page_load_strategy = "eager"
+    # chrome_options.page_load_strategy = "eager"
 
     driver = webdriver.Chrome(options=chrome_options)
     # EMPTY LIST OF OFFERS (offers is later used as a list of lists)
@@ -63,10 +66,10 @@ def search_offers(link_list_inner=link_list):
         try:
             # SEARCH ELEMENTS IN DOM WITH XPATH SPECIFIED EARLIER
             elements = WebDriverWait(
-                driver, timeout=2, ignored_exceptions=ignored_exceptions
+                driver, timeout=2, ignored_exceptions=IGNORED_EXCEPTIONS
             ).until(
                 expected_conditions.visibility_of_all_elements_located(
-                    (By.XPATH, xpath)
+                    (By.XPATH, XPATH)
                 )
             )
 
@@ -78,7 +81,7 @@ def search_offers(link_list_inner=link_list):
                 split_offer = offer.text.split("\n")
 
                 # LOADS ALREADY_NOTIFIED
-                with open(already_notified_path, "rb") as f:
+                with open(ALREADY_NOTIFIED_PATH, "rb") as f:
                     already_notified = pickle.load(f)
 
                 # IF ID IS IN ALREADY_NOTIFIED THEN SKIP ONE ITERATION OF THE LOOP
@@ -120,7 +123,7 @@ def search_offers(link_list_inner=link_list):
                 offer_notify_count += 1
 
                 # AFTER NOTIFYING ADDS ID TO ALREADY_NOTIFIED
-                with open(already_notified_path, "wb") as f:
+                with open(ALREADY_NOTIFIED_PATH, "wb") as f:
                     already_notified.add(offer.get_attribute("id"))
                     pickle.dump(already_notified, f, protocol=pickle.HIGHEST_PROTOCOL)
 

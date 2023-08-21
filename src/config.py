@@ -1,6 +1,3 @@
-# FILL IN WITH YOUR INFO
-params = {
-    "API_KEY": "Replace this (keep quotation)",
-    "USER_ID": "Replace this (keep quotation)",
-    "SEARCH_INFO_LOCATION": ".\data\data_long.csv",
-}
+#
+params = {"API_KEY": None, "USER_ID": None}
+search_info_location = ".\data\data_long.csv"
