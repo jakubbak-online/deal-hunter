@@ -14,9 +14,12 @@ for element in config:
         config[f"{element}"] = params[f"{element}"]
     finally:
         if config[f"{element}"] is None:
-            print(
-                "ERROR: Lack of correct variable in environment variables, or config.py"
-            )
+            config[f"{element}"] = params[f"{element}"]
+
+    if config[f"{element}"] is None:
+        print(
+            "ERROR: Lack of correct variable in environment variables, or config.py"
+        )
 
 print(config)
 
