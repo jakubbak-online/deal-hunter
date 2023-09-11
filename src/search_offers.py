@@ -11,7 +11,7 @@ from selenium.webdriver.chrome.options import Options
 # OTHER IMPORTS
 import pickle
 import time
-import chromedriver_autoinstaller
+import chromedriver_autoinstaller_fix
 
 # MY IMPORTS
 import notify
@@ -37,7 +37,7 @@ ALREADY_NOTIFIED_PATH = "./data/already_notified.pickle"
 
 LINK_LIST = search_loader.search_loader(search_info_location)
 
-chromedriver_autoinstaller.install()
+chromedriver_autoinstaller_fix.install()
 
 
 def search_offers(link_list_inner=LINK_LIST):
