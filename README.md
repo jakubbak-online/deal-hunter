@@ -1,10 +1,13 @@
 
-# deal-hunter - OLX.pl sniping tool
+# Deal Hunter - OLX.pl sniping tool
+---------------
+## What is Deal Hunter?
 
-## What is deal-hunter?
+Deal Hunter is a tool that notifies user, when an item with given conditions (such as price, name etc.) pops up on OLX.pl (polish craigslist-like site).
 
-deal-hunter is a sniping tool for OLX.pl (polish craigslist-like site). \
-It takes .csv file as an input with search information, and telegram bot API to send notifications.
+Made with love, and a little bit of Python, Selenium and Telegram API.
+
+It takes .csv file as an input with search information, and Telegram bot API to send notifications to user.
 
 #### Requirements
 
