@@ -19,6 +19,8 @@ import search_loader
 
 # VARIABLES FROM CONFIG
 from config import search_info_location
+# Internal imports
+from mierz_czas import mierz_czas
 
 # CONSTANTS TO BE USED LATER
 IGNORED_EXCEPTIONS = (
@@ -40,6 +42,7 @@ LINK_LIST = search_loader.search_loader(search_info_location)
 chromedriver_autoinstaller_fix.install()
 
 
+@mierz_czas.mierz_czas
 def search_offers(link_list_inner=LINK_LIST):
     # CREATES WEBDRIVER INSTANCE, WITH OPTIONS ADDED
     chrome_options = Options()
@@ -95,15 +98,27 @@ def search_offers(link_list_inner=LINK_LIST):
                 # INSERTS ID INTO OFFER
                 split_offer.insert(0, offer.get_attribute("id"))
 
+                ''' OLX modified their display UI, doesnt work (for now)
                 # SEPARATES LOCATION FROM TIME
-                split_offer_buffer = split_offer[5].split(" - ")
+                try:
+                    split_offer_buffer = split_offer[5].split(" - ")
+                except IndexError:
+                    pass
                 split_offer.append(split_offer_buffer[1])
                 split_offer[5] = split_offer_buffer[0]
+                '''
 
                 # APPENDS LINK TO SPLIT_OFFER
                 split_offer.append(
                     offer.find_element(By.TAG_NAME, "a").get_attribute("href")
                 )
+
+                for _ in range(0, 10):
+                    try:
+                        if split_offer[_] is not None:
+                            pass
+                    except IndexError:
+                        split_offer.append("error")
 
                 notify.notify(
                     offer_id=split_offer[0],
