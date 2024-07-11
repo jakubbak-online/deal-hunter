@@ -1,8 +1,8 @@
 import pickle
-
+from config import ALREADY_NOTIFIED_PATH
 
 def print_all():
-    with open("already_notified.pickle", "rb") as f:
+    with open(ALREADY_NOTIFIED_PATH, "rb") as f:
         f = pickle.load(f)
 
         for line in f:
@@ -10,7 +10,7 @@ def print_all():
 
 
 def check_if_exists(id_to_check=""):
-    with open("already_notified.pickle", "rb") as f:
+    with open(ALREADY_NOTIFIED_PATH, "rb") as f:
         f = pickle.load(f)
 
     if id_to_check != "":
@@ -21,12 +21,12 @@ def check_if_exists(id_to_check=""):
             print("NO")
 
 
-def clear_file(pickle_file="already_notified.pickle"):
+def clear_file(pickle_file=ALREADY_NOTIFIED_PATH):
     with open(pickle_file, "wb") as f:
         pickle.dump(set(), f)
 
 
-def populate_file(pickle_file="already_notified.pickle"):
+def populate_file(pickle_file=ALREADY_NOTIFIED_PATH):
     how_many_elements = 1_000_000
     populate_set = set()
     for _ in range(0, how_many_elements):

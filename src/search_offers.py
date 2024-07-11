@@ -9,6 +9,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 
 # OTHER IMPORTS
+import os
 import pickle
 import time
 import chromedriver_autoinstaller_fix
@@ -16,9 +17,10 @@ import chromedriver_autoinstaller_fix
 # MY IMPORTS
 import notify
 import search_loader
+from data.pickle_helper import check_if_exists, clear_file
 
 # VARIABLES FROM CONFIG
-from config import search_info_location
+from config import ALREADY_NOTIFIED_PATH, SEARCH_INFO_LOCATION
 # Internal imports
 from mierz_czas import mierz_czas
 
@@ -35,9 +37,7 @@ XPATH = (
     '/child::div[@data-cy="l-card"and not(contains(descendant::div, "Wyróżnione"))]'
 )
 
-ALREADY_NOTIFIED_PATH = "./data/already_notified.pickle"
-
-LINK_LIST = search_loader.search_loader(search_info_location)
+LINK_LIST = search_loader.search_loader(SEARCH_INFO_LOCATION)
 
 chromedriver_autoinstaller_fix.install()
 
@@ -131,13 +131,26 @@ def search_offers(link_list_inner=LINK_LIST):
                     offer_link=split_offer[7],
                 )
 
+                match offer_notify_count:
+                    case 1:
+                        suffix = "st"
+                    case 2:
+                        suffix = "nd"
+                    case 3:
+                        suffix = "rd"
+                    case _:
+                        suffix = "th"
+
                 print(
                     f"{offer_progress} Notified user about offer number {offer.get_attribute('id'):9}. "
-                    f"It was {offer_notify_count}'th offer"
+                    f"It was {offer_notify_count}{suffix} offer"
                 )
                 offer_notify_count += 1
 
                 # AFTER NOTIFYING ADDS ID TO ALREADY_NOTIFIED
+                if (not check_if_exists()):
+                    clear_file()
+
                 with open(ALREADY_NOTIFIED_PATH, "wb") as f:
                     already_notified.add(offer.get_attribute("id"))
                     pickle.dump(already_notified, f, protocol=pickle.HIGHEST_PROTOCOL)
