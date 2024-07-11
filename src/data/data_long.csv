@@ -1,7 +1,7 @@
-primary_category,secondary_category,subcategory,localization,query,distance,min_price,max_price,condition
-elektronika,fotografia,obiektywy,Gdynia,sony,2,50,500,used
-elektronika,fotografia,obiektywy,Gdynia,sony,2,50,500,new
-elektronika,fotografia,obiektywy,Warszawa,canon,2,50,500,used
-elektronika,fotografia,obiektywy,Warszawa,canon,2,50,500,new
-elektronika,fotografia,obiektywy,Poznan,canon,2,50,500,used
-elektronika,fotografia,obiektywy,Poznan,canon,2,50,500,new
+primary_category,secondary_category,subcategory,subsubcategory,localization,query,distance,min_price,max_price,condition
+elektronika,fotografia,obiektywy,,Gdynia,sony,2,50,500,used
+elektronika,fotografia,obiektywy,,Gdynia,sony,2,50,500,new
+elektronika,fotografia,obiektywy,,Warszawa,canon,2,50,500,used
+elektronika,fotografia,obiektywy,,Warszawa,canon,2,50,500,new
+elektronika,fotografia,obiektywy,,Poznan,canon,2,50,500,used
+elektronika,fotografia,obiektywy,,Poznan,canon,2,50,500,new
