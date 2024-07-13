@@ -41,6 +41,47 @@ LINK_LIST = search_loader.search_loader(SEARCH_INFO_LOCATION)
 
 chromedriver_autoinstaller_fix.install()
 
+class Offer:
+    """Represents an offer scraped from OLX."""
+    def __init__(self, id: str, name: str, price: str, negotiation: str, condition: str, location: str, date: str, link: str) -> None:
+        self.id=id
+        self.name=name
+        self.price=price
+        self.negotiation=negotiation
+        self.condition=condition
+        self.location=location
+        self.date=date
+        self.link=link
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Offer):
+            return False
+
+        return (
+            self.id == other.id and
+            self.name == other.name and
+            self.price == other.price and
+            self.negotiation == other.negotiation and
+            self.condition == other.condition and
+            self.location == other.location and
+            self.date == other.date and
+            self.link == other.link
+        )
+
+    def __hash__(self) -> int:
+        return int(self.id)
+
+    def __str__(self) -> str:
+        return (
+f"""
+{self.name} ({self.id})
+    - {self.price}, {self.negotiation}
+    - {self.condition}
+    - {self.location}
+    - {self.date}
+    - {self.link}
+"""
+)
 
 @mierz_czas.mierz_czas
 def search_offers(link_list_inner=LINK_LIST):
@@ -83,14 +124,6 @@ def search_offers(link_list_inner=LINK_LIST):
             for count2, offer in enumerate(offers[count]):
                 split_offer = offer.text.split("\n")
 
-                # LOADS ALREADY_NOTIFIED
-                with open(ALREADY_NOTIFIED_PATH, "rb") as f:
-                    already_notified = pickle.load(f)
-
-                # IF ID IS IN ALREADY_NOTIFIED THEN SKIP ONE ITERATION OF THE LOOP
-                if offer.get_attribute("id") in already_notified:
-                    continue
-
                 # HANDLES IF OFFER IS OPEN TO NEGOTIATIONS
                 if split_offer[2] != "do negocjacji":
                     split_offer.insert(2, "nie do negocjacji")
@@ -120,16 +153,29 @@ def search_offers(link_list_inner=LINK_LIST):
                     except IndexError:
                         split_offer.append("error")
 
-                notify.notify(
-                    offer_id=split_offer[0],
-                    offer_name=split_offer[1],
-                    offer_price=split_offer[2],
-                    offer_negotiation=split_offer[3],
-                    offer_condition=split_offer[4],
-                    offer_location=split_offer[5],
-                    offer_date=split_offer[6],
-                    offer_link=split_offer[7],
+                offer = Offer(
+                    split_offer[0],
+                    split_offer[1],
+                    split_offer[2],
+                    split_offer[3],
+                    split_offer[4],
+                    split_offer[5],
+                    split_offer[6],
+                    split_offer[7]
                 )
+
+                # LOADS ALREADY_NOTIFIED
+                if (not os.path.isfile(ALREADY_NOTIFIED_PATH)):
+                    clear_file()
+
+                with open(ALREADY_NOTIFIED_PATH, "rb") as f:
+                    already_notified = pickle.load(f)
+
+                # IF ID IS IN ALREADY_NOTIFIED THEN SKIP ONE ITERATION OF THE LOOP
+                if offer in already_notified:
+                    break
+
+                notify.notify(offer)
 
                 match offer_notify_count:
                     case 1:
@@ -142,17 +188,14 @@ def search_offers(link_list_inner=LINK_LIST):
                         suffix = "th"
 
                 print(
-                    f"{offer_progress} Notified user about offer number {offer.get_attribute('id'):9}. "
-                    f"It was {offer_notify_count}{suffix} offer"
+                    f"{offer_progress} Notified user about offer number {offer.id:9}. "
+                    f"It was the {offer_notify_count}{suffix} offer"
                 )
                 offer_notify_count += 1
 
                 # AFTER NOTIFYING ADDS ID TO ALREADY_NOTIFIED
-                if (not check_if_exists()):
-                    clear_file()
-
                 with open(ALREADY_NOTIFIED_PATH, "wb") as f:
-                    already_notified.add(offer.get_attribute("id"))
+                    already_notified.add(offer)
                     pickle.dump(already_notified, f, protocol=pickle.HIGHEST_PROTOCOL)
 
         except TimeoutException:
