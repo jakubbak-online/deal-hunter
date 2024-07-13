@@ -11,7 +11,6 @@ from selenium.webdriver.chrome.options import Options
 # OTHER IMPORTS
 import os
 import pickle
-import time
 import chromedriver_autoinstaller_fix
 
 # MY IMPORTS
@@ -22,7 +21,7 @@ from data.pickle_helper import check_if_exists, clear_file
 # VARIABLES FROM CONFIG
 from config import ALREADY_NOTIFIED_PATH, SEARCH_INFO_LOCATION
 # Internal imports
-from mierz_czas import mierz_czas
+from time_utils import measure_time, time_helper
 
 # CONSTANTS TO BE USED LATER
 IGNORED_EXCEPTIONS = (
@@ -83,7 +82,7 @@ f"""
 """
 )
 
-@mierz_czas.mierz_czas
+@measure_time.measure_time
 def search_offers(link_list_inner=LINK_LIST):
     # CREATES WEBDRIVER INSTANCE, WITH OPTIONS ADDED
     chrome_options = Options()
@@ -91,6 +90,9 @@ def search_offers(link_list_inner=LINK_LIST):
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--incognito")
     # chrome_options.page_load_strategy = "eager"
+
+    # another fix for nixos
+    chrome_options.binary_location = "/etc/profiles/per-user/kamil/bin/google-chrome-stable"
 
     driver = webdriver.Chrome(options=chrome_options)
     # EMPTY LIST OF OFFERS (offers is later used as a list of lists)
@@ -105,7 +107,7 @@ def search_offers(link_list_inner=LINK_LIST):
         # PROGRESS COUNT PRINT
         offer_progress = f"({count+1}/{len(link_list_inner)})"
         offer_notify_count = 1
-        print(f"\n{offer_progress} {time.ctime()[11:19]} || {link}")
+        print(f"\n{time_helper.human_readable_time()}: {offer_progress} || {link}")
 
         try:
             # SEARCH ELEMENTS IN DOM WITH XPATH SPECIFIED EARLIER
@@ -188,7 +190,7 @@ def search_offers(link_list_inner=LINK_LIST):
                         suffix = "th"
 
                 print(
-                    f"{offer_progress} Notified user about offer number {offer.id:9}. "
+                    f"\tNotified user about offer number {offer.id:9}. "
                     f"It was the {offer_notify_count}{suffix} offer"
                 )
                 offer_notify_count += 1
@@ -200,11 +202,11 @@ def search_offers(link_list_inner=LINK_LIST):
 
         except TimeoutException:
             offer_notify_count = 0
-            print(f"{offer_progress} No offers in search")
+            print(f"\tNo offers in search")
             # APPENDS EMPTY LIST TO OFFERS, SO LOOP CAN PROCEED NORMALLY
             offers.append([])
 
         if offer_notify_count == 1:
-            print(f"{offer_progress} No new offers were seen")
+            print(f"\tNo new offers were seen")
 
     driver.quit()
