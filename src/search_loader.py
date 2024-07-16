@@ -5,6 +5,7 @@ def link_composer(
     primary_category=None,
     secondary_category=None,
     subcategory=None,
+    subsubcategory=None,
     localization=None,
     query=None,
     distance=None,
@@ -29,6 +30,9 @@ def link_composer(
 
         if subcategory is not empty:
             final_query += subcategory + "/"
+
+        if subsubcategory is not empty:
+            final_query += subsubcategory + "/"
 
     if localization is not empty:
         final_query += localization + "/"
@@ -84,12 +88,13 @@ def search_loader(data):
                 primary_category=row[0],
                 secondary_category=row[1],
                 subcategory=row[2],
-                localization=row[3],
-                query=row[4],
-                distance=row[5],
-                min_price=row[6],
-                max_price=row[7],
-                condition=row[8],
+                subsubcategory=row[3],
+                localization=row[4],
+                query=row[5],
+                distance=row[6],
+                min_price=row[7],
+                max_price=row[8],
+                condition=row[9],
             )
 
             linklist.append(link)

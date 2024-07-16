@@ -1,7 +1,6 @@
 from time import time
 
-
-def mierz_czas(function):
+def measure_time(function):
     def timing(*args, **kwargs):
         start_time = time()
         function(*args, **kwargs)

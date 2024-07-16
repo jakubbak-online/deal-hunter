@@ -9,18 +9,19 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 
 # OTHER IMPORTS
+import os
 import pickle
-import time
 import chromedriver_autoinstaller_fix
 
 # MY IMPORTS
 import notify
 import search_loader
+from data.pickle_helper import check_if_exists, clear_file
 
 # VARIABLES FROM CONFIG
-from config import search_info_location
+from config import ALREADY_NOTIFIED_PATH, SEARCH_INFO_LOCATION
 # Internal imports
-from mierz_czas import mierz_czas
+from time_utils import measure_time, time_helper
 
 # CONSTANTS TO BE USED LATER
 IGNORED_EXCEPTIONS = (
@@ -35,14 +36,53 @@ XPATH = (
     '/child::div[@data-cy="l-card"and not(contains(descendant::div, "Wyróżnione"))]'
 )
 
-ALREADY_NOTIFIED_PATH = "./data/already_notified.pickle"
-
-LINK_LIST = search_loader.search_loader(search_info_location)
+LINK_LIST = search_loader.search_loader(SEARCH_INFO_LOCATION)
 
 chromedriver_autoinstaller_fix.install()
 
+class Offer:
+    """Represents an offer scraped from OLX."""
+    def __init__(self, id: str, name: str, price: str, negotiation: str, condition: str, location: str, date: str, link: str) -> None:
+        self.id=id
+        self.name=name
+        self.price=price
+        self.negotiation=negotiation
+        self.condition=condition
+        self.location=location
+        self.date=date
+        self.link=link
 
-@mierz_czas.mierz_czas
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Offer):
+            return False
+
+        return (
+            self.id == other.id and
+            self.name == other.name and
+            self.price == other.price and
+            self.negotiation == other.negotiation and
+            self.condition == other.condition and
+            self.location == other.location and
+            self.date == other.date and
+            self.link == other.link
+        )
+
+    def __hash__(self) -> int:
+        return int(self.id)
+
+    def __str__(self) -> str:
+        return (
+f"""
+{self.name} ({self.id})
+    - {self.price}, {self.negotiation}
+    - {self.condition}
+    - {self.location}
+    - {self.date}
+    - {self.link}
+"""
+)
+
+@measure_time.measure_time
 def search_offers(link_list_inner=LINK_LIST):
     # CREATES WEBDRIVER INSTANCE, WITH OPTIONS ADDED
     chrome_options = Options()
@@ -50,6 +90,9 @@ def search_offers(link_list_inner=LINK_LIST):
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--incognito")
     # chrome_options.page_load_strategy = "eager"
+
+    # another fix for nixos
+    chrome_options.binary_location = "/etc/profiles/per-user/kamil/bin/google-chrome-stable"
 
     driver = webdriver.Chrome(options=chrome_options)
     # EMPTY LIST OF OFFERS (offers is later used as a list of lists)
@@ -64,7 +107,7 @@ def search_offers(link_list_inner=LINK_LIST):
         # PROGRESS COUNT PRINT
         offer_progress = f"({count+1}/{len(link_list_inner)})"
         offer_notify_count = 1
-        print(f"\n{offer_progress} {time.ctime()[11:19]} || {link}")
+        print(f"\n{time_helper.human_readable_time()}: {offer_progress} || {link}")
 
         try:
             # SEARCH ELEMENTS IN DOM WITH XPATH SPECIFIED EARLIER
@@ -82,14 +125,6 @@ def search_offers(link_list_inner=LINK_LIST):
             # ITERATES THROUGH EVERY OFFER IN SEARCH
             for count2, offer in enumerate(offers[count]):
                 split_offer = offer.text.split("\n")
-
-                # LOADS ALREADY_NOTIFIED
-                with open(ALREADY_NOTIFIED_PATH, "rb") as f:
-                    already_notified = pickle.load(f)
-
-                # IF ID IS IN ALREADY_NOTIFIED THEN SKIP ONE ITERATION OF THE LOOP
-                if offer.get_attribute("id") in already_notified:
-                    continue
 
                 # HANDLES IF OFFER IS OPEN TO NEGOTIATIONS
                 if split_offer[2] != "do negocjacji":
@@ -120,35 +155,58 @@ def search_offers(link_list_inner=LINK_LIST):
                     except IndexError:
                         split_offer.append("error")
 
-                notify.notify(
-                    offer_id=split_offer[0],
-                    offer_name=split_offer[1],
-                    offer_price=split_offer[2],
-                    offer_negotiation=split_offer[3],
-                    offer_condition=split_offer[4],
-                    offer_location=split_offer[5],
-                    offer_date=split_offer[6],
-                    offer_link=split_offer[7],
+                offer = Offer(
+                    split_offer[0],
+                    split_offer[1],
+                    split_offer[2],
+                    split_offer[3],
+                    split_offer[4],
+                    split_offer[5],
+                    split_offer[6],
+                    split_offer[7]
                 )
 
+                # LOADS ALREADY_NOTIFIED
+                if (not os.path.isfile(ALREADY_NOTIFIED_PATH)):
+                    clear_file()
+
+                with open(ALREADY_NOTIFIED_PATH, "rb") as f:
+                    already_notified = pickle.load(f)
+
+                # IF ID IS IN ALREADY_NOTIFIED THEN SKIP ONE ITERATION OF THE LOOP
+                if offer in already_notified:
+                    break
+
+                notify.notify(offer)
+
+                match offer_notify_count:
+                    case 1:
+                        suffix = "st"
+                    case 2:
+                        suffix = "nd"
+                    case 3:
+                        suffix = "rd"
+                    case _:
+                        suffix = "th"
+
                 print(
-                    f"{offer_progress} Notified user about offer number {offer.get_attribute('id'):9}. "
-                    f"It was {offer_notify_count}'th offer"
+                    f"\tNotified user about offer number {offer.id:9}. "
+                    f"It was the {offer_notify_count}{suffix} offer"
                 )
                 offer_notify_count += 1
 
                 # AFTER NOTIFYING ADDS ID TO ALREADY_NOTIFIED
                 with open(ALREADY_NOTIFIED_PATH, "wb") as f:
-                    already_notified.add(offer.get_attribute("id"))
+                    already_notified.add(offer)
                     pickle.dump(already_notified, f, protocol=pickle.HIGHEST_PROTOCOL)
 
         except TimeoutException:
             offer_notify_count = 0
-            print(f"{offer_progress} No offers in search")
+            print(f"\tNo offers in search")
             # APPENDS EMPTY LIST TO OFFERS, SO LOOP CAN PROCEED NORMALLY
             offers.append([])
 
         if offer_notify_count == 1:
-            print(f"{offer_progress} No new offers were seen")
+            print(f"\tNo new offers were seen")
 
     driver.quit()
