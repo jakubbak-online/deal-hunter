@@ -6,27 +6,22 @@ from bs4 import BeautifulSoup
 import os
 import pickle
 
-# MY IMPORTS
-import notify
 from . import search_loader
-from data.pickle_helper import clear_file
 from .base import Offer
 
 # VARIABLES FROM CONFIG
-from config import ALREADY_NOTIFIED_PATH, SEARCH_INFO_LOCATION
+from config import SEARCH_INFO_LOCATION
 
 # Internal imports
-from time_utils import measure_time, time_helper
+from time_utils import time_helper
 
 LINK_LIST = search_loader.search_loader(SEARCH_INFO_LOCATION)
 
-@measure_time.measure_time
-def search_bs(link_list_inner=LINK_LIST):
+def search_bs(link_list_inner=LINK_LIST) -> list[Offer]:
     offers = []
 
     for count, link in enumerate(link_list_inner):
         print(f"\n{time_helper.human_readable_time()}: ({count+1}/{len(link_list_inner)}) || {link}")
-        offer_notify_count = 1
 
         response = requests.get(link)
         soup = BeautifulSoup(response.content, 'html.parser')
@@ -91,42 +86,11 @@ def search_bs(link_list_inner=LINK_LIST):
                         offer_link
                     )
 
-                    if (not os.path.isfile(ALREADY_NOTIFIED_PATH)):
-                        clear_file()
-
-                    with open(ALREADY_NOTIFIED_PATH, "rb") as f:
-                        already_notified = pickle.load(f)
-
-                    if offer in already_notified:
-                        print(f"\t\talready seen, skipping")
-                        continue
-
-                    notify.notify(offer)
-
-                    match offer_notify_count:
-                        case 1:
-                            suffix = "st"
-                        case 2:
-                            suffix = "nd"
-                        case 3:
-                            suffix = "rd"
-                        case _:
-                            suffix = "th"
-
-                    print(
-                        f"\tNotified user about offer {offer.id:9}. "
-                        f"It was the {offer_notify_count}{suffix} offer"
-                    )
-                    offer_notify_count += 1
-
-                    with open(ALREADY_NOTIFIED_PATH, "wb") as f:
-                        already_notified.add(offer)
-                        pickle.dump(already_notified, f, protocol=pickle.HIGHEST_PROTOCOL)
+                    offers.append(offer)
 
                 except Exception as e:
                     print(f"\tError processing offer: {e}")
 
             page += 1
 
-        if offer_notify_count == 1:
-            print(f"\tNo new offers were seen")
+    return offers

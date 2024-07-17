@@ -1,4 +1,14 @@
-from . import search_loader
+import os
+import pickle
+from enum import Enum
+
+# MY IMPORTS
+import notify
+from data.pickle_helper import clear_file
+from time_utils import measure_time
+
+# VARIABLES FROM CONFIG
+from config import ALREADY_NOTIFIED_PATH
 
 class Offer:
     """Represents an offer scraped from OLX."""
@@ -41,3 +51,53 @@ f"""
     - {self.link}
 """
 )
+
+# this must be here to prevent import issues, untill proper module initialization is implemented
+from . import search_loader, search_selenium, search_bs
+
+class Backend(Enum):
+    SELENIUM = 1
+    BEAUTIFUL_SOUP = 2
+
+@measure_time.measure_time
+def search_offers(backend: Backend = Backend.SELENIUM) -> None:
+    match backend:
+        case Backend.SELENIUM:
+            offers = search_selenium.search_selenium()
+        case Backend.BEAUTIFUL_SOUP:
+            offers = search_bs.search_bs()
+
+    # notifications
+    if (not os.path.isfile(ALREADY_NOTIFIED_PATH)):
+        clear_file()
+
+    with open(ALREADY_NOTIFIED_PATH, "rb") as f:
+        already_notified = pickle.load(f)
+
+    for index in range(len(offers)):
+        offer = offers[index]
+
+        if offer in already_notified:
+            print(f"\t\toffer already seen, skipping notify")
+            continue
+
+        notify.notify(offer)
+
+        match index + 1:
+            case 1:
+                suffix = "st"
+            case 2:
+                suffix = "nd"
+            case 3:
+                suffix = "rd"
+            case _:
+                suffix = "th"
+
+        print(
+            f"\tNotified user about offer {offer.id:9}. "
+            f"It was the {index + 1}{suffix} offer"
+        )
+
+        with open(ALREADY_NOTIFIED_PATH, "wb") as f:
+            already_notified.add(offer)
+            pickle.dump(already_notified, f, protocol=pickle.HIGHEST_PROTOCOL)

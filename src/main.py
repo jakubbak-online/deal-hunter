@@ -1,15 +1,16 @@
 import time
+
 # internal imports
-from scraper import search_selenium, search_bs
 from time_utils import time_helper
+from scraper.base import Backend, search_offers
 
 if __name__ == '__main__':
     while True:
         # Selenium based backend
-        search_selenium.search_selenium()
+        # search_offers()
 
         # Beautiful Soup based backend
-        # search_bs.search_bs()
+        search_offers(Backend.BEAUTIFUL_SOUP)
 
         print(f"{time_helper.human_readable_time()}: Started sleeping")
         time.sleep(150)
