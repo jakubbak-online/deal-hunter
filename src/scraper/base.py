@@ -74,16 +74,13 @@ def search_offers(backend: Backend = Backend.SELENIUM) -> None:
     with open(ALREADY_NOTIFIED_PATH, "rb") as f:
         already_notified = pickle.load(f)
 
-    for index in range(len(offers)):
-        offer = offers[index]
-
+    for count, offer in enumerate(offers, 1):
         if offer in already_notified:
-            print(f"\t\toffer already seen, skipping notify")
             continue
 
         notify.notify(offer)
 
-        match index + 1:
+        match count:
             case 1:
                 suffix = "st"
             case 2:
@@ -95,7 +92,7 @@ def search_offers(backend: Backend = Backend.SELENIUM) -> None:
 
         print(
             f"\tNotified user about offer {offer.id:9}. "
-            f"It was the {index + 1}{suffix} offer"
+            f"It was the {count}{suffix} offer"
         )
 
         with open(ALREADY_NOTIFIED_PATH, "wb") as f:

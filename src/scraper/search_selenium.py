@@ -64,7 +64,7 @@ def search_selenium(link_list_inner=LINK_LIST) -> list[Offer]:
         # PROGRESS COUNT PRINT
         offer_progress = f"({count+1}/{len(link_list_inner)})"
         offer_notify_count = 1
-        print(f"\n{time_helper.human_readable_time()}: {offer_progress} || {link}")
+        print(f"\n{time_helper.human_readable_time()} | {offer_progress} || {link}")
 
         try:
             # SEARCH ELEMENTS IN DOM WITH XPATH SPECIFIED EARLIER
