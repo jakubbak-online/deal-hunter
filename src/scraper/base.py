@@ -3,7 +3,7 @@ import pickle
 from enum import Enum
 
 # MY IMPORTS
-import notify
+from notify import notify
 from data.pickle_helper import clear_file
 from time_utils import measure_time
 
@@ -78,7 +78,7 @@ def search_offers(backend: Backend = Backend.SELENIUM) -> None:
         if offer in already_notified:
             continue
 
-        notify.notify(offer)
+        notify(offer)
 
         match count:
             case 1:
