@@ -14,14 +14,14 @@ import pickle
 import chromedriver_autoinstaller_fix
 
 # MY IMPORTS
-import notify
-import search_loader
+from . import search_loader
 from data.pickle_helper import check_if_exists, clear_file
+from .base import Offer
 
 # VARIABLES FROM CONFIG
-from config import ALREADY_NOTIFIED_PATH, SEARCH_INFO_LOCATION
+from config import SEARCH_INFO_LOCATION
 # Internal imports
-from time_utils import measure_time, time_helper
+from time_utils import time_helper
 
 # CONSTANTS TO BE USED LATER
 IGNORED_EXCEPTIONS = (
@@ -40,50 +40,7 @@ LINK_LIST = search_loader.search_loader(SEARCH_INFO_LOCATION)
 
 chromedriver_autoinstaller_fix.install()
 
-class Offer:
-    """Represents an offer scraped from OLX."""
-    def __init__(self, id: str, name: str, price: str, negotiation: str, condition: str, location: str, date: str, link: str) -> None:
-        self.id=id
-        self.name=name
-        self.price=price
-        self.negotiation=negotiation
-        self.condition=condition
-        self.location=location
-        self.date=date
-        self.link=link
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, Offer):
-            return False
-
-        return (
-            self.id == other.id and
-            self.name == other.name and
-            self.price == other.price and
-            self.negotiation == other.negotiation and
-            self.condition == other.condition and
-            self.location == other.location and
-            self.date == other.date and
-            self.link == other.link
-        )
-
-    def __hash__(self) -> int:
-        return int(self.id)
-
-    def __str__(self) -> str:
-        return (
-f"""
-{self.name} ({self.id})
-    - {self.price}, {self.negotiation}
-    - {self.condition}
-    - {self.location}
-    - {self.date}
-    - {self.link}
-"""
-)
-
-@measure_time.measure_time
-def search_offers(link_list_inner=LINK_LIST):
+def initialize_webdriver():
     # CREATES WEBDRIVER INSTANCE, WITH OPTIONS ADDED
     chrome_options = Options()
     chrome_options.add_argument("--headless")
@@ -91,13 +48,13 @@ def search_offers(link_list_inner=LINK_LIST):
     chrome_options.add_argument("--incognito")
     # chrome_options.page_load_strategy = "eager"
 
-    # another fix for nixos
-    chrome_options.binary_location = "/etc/profiles/per-user/kamil/bin/google-chrome-stable"
+    return webdriver.Chrome(options=chrome_options)
 
-    driver = webdriver.Chrome(options=chrome_options)
-    # EMPTY LIST OF OFFERS (offers is later used as a list of lists)
-    # DON'T MOVE PLS
-    offers = list()
+def search_selenium(link_list_inner=LINK_LIST) -> list[Offer]:
+    offers = []     # "raw" offers
+    olx_offers = []
+
+    driver = initialize_webdriver()
 
     # GOES FOR EVERY LINK IN LIST OF LINKS
     for count, link in enumerate(link_list_inner):
@@ -107,7 +64,7 @@ def search_offers(link_list_inner=LINK_LIST):
         # PROGRESS COUNT PRINT
         offer_progress = f"({count+1}/{len(link_list_inner)})"
         offer_notify_count = 1
-        print(f"\n{time_helper.human_readable_time()}: {offer_progress} || {link}")
+        print(f"\n{time_helper.human_readable_time()} | {offer_progress} || {link}")
 
         try:
             # SEARCH ELEMENTS IN DOM WITH XPATH SPECIFIED EARLIER
@@ -166,39 +123,9 @@ def search_offers(link_list_inner=LINK_LIST):
                     split_offer[7]
                 )
 
-                # LOADS ALREADY_NOTIFIED
-                if (not os.path.isfile(ALREADY_NOTIFIED_PATH)):
-                    clear_file()
+                olx_offers.append(offer)
 
-                with open(ALREADY_NOTIFIED_PATH, "rb") as f:
-                    already_notified = pickle.load(f)
-
-                # IF ID IS IN ALREADY_NOTIFIED THEN SKIP ONE ITERATION OF THE LOOP
-                if offer in already_notified:
-                    break
-
-                notify.notify(offer)
-
-                match offer_notify_count:
-                    case 1:
-                        suffix = "st"
-                    case 2:
-                        suffix = "nd"
-                    case 3:
-                        suffix = "rd"
-                    case _:
-                        suffix = "th"
-
-                print(
-                    f"\tNotified user about offer number {offer.id:9}. "
-                    f"It was the {offer_notify_count}{suffix} offer"
-                )
                 offer_notify_count += 1
-
-                # AFTER NOTIFYING ADDS ID TO ALREADY_NOTIFIED
-                with open(ALREADY_NOTIFIED_PATH, "wb") as f:
-                    already_notified.add(offer)
-                    pickle.dump(already_notified, f, protocol=pickle.HIGHEST_PROTOCOL)
 
         except TimeoutException:
             offer_notify_count = 0
@@ -210,3 +137,5 @@ def search_offers(link_list_inner=LINK_LIST):
             print(f"\tNo new offers were seen")
 
     driver.quit()
+
+    return olx_offers

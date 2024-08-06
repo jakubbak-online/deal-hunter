@@ -1,3 +1,4 @@
+import threading
 import telebot
 from telebot.apihelper import ApiTelegramException
 
@@ -6,8 +7,7 @@ from handle_config import config
 # CREATE BOT INSTANCE
 bot = telebot.TeleBot(config["API_KEY"])
 
-
-def notify(offer):
+def _notify(offer):
     try:
         bot.send_message(
             chat_id=config["USER_ID"],
@@ -47,3 +47,7 @@ def notify(offer):
         )
     except ApiTelegramException:
         print("Check if you're authorized, or if your API key is correct")
+
+def notify(offer):
+    thread = threading.Thread(target=_notify, args=(offer,))
+    thread.start()

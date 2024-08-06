@@ -1,6 +1,5 @@
 import csv
 
-
 def link_composer(
     primary_category=None,
     secondary_category=None,
